@@ -50,6 +50,7 @@ def getDataLoader(data_dir, batch_size=4):
 	# Returning dataloader and metadata only
     return dataloaders, data_sizes, class_names
 
+
 # Retrieving or computing the scaling parameters as two lists (mean, std) of 3 values (R, G, B)
 def getScaleParameters(data_dir):
     try:
