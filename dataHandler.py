@@ -72,7 +72,7 @@ def getScaleParameters(data_dir):
         return params
 
     # Computing mean and variance from scratch
-    def computeScaleParameters(data_dir):
+def computeScaleParameters(data_dir):
     train_dir = os.path.join(data_dir, "train")
     n_pixels_glob = 0
 
