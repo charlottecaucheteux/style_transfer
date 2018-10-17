@@ -55,12 +55,15 @@ def getScaleParameters(data_dir):
     try:
 		# Trying to retrieve
         params = pickle.load("scaleParams.P")
-        return params
+		with open('scaleParams.P', 'rb') as input:
+			return(pickle.load(input))
     except:
 		# If not present, computing.
         print("Computing the parameters")
         params = computeScaleParameters(data_dir)
-        pickle.dump(params, "scaleParams.P")
+		# Writing for future use
+		with open('scaleParams.P', 'wb') as output:
+			pickle.dump(params, output)
         return params
 
 # Computing mean and variance from scratch
