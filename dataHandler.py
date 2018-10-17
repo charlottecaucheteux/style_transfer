@@ -13,7 +13,7 @@ def getDataLoader(data_dir, batch_size=4):
 
 	# Computing scaling parameters
     rgb_mean, rgb_std = getScaleParameters(data_dir)
-	print("Normalizing the images with the following parameters for mean and std")
+    print("Normalizing the images with the following parameters for mean and std")
     print(rgb_mean, rgb_std)
 
 	# For the data augmentation
