@@ -54,7 +54,6 @@ def getDataLoader(data_dir, batch_size=4):
 def getScaleParameters(data_dir):
     try:
 		# Trying to retrieve
-        params = pickle.load("scaleParams.P")
 		with open('scaleParams.P', 'rb') as input:
 			return(pickle.load(input))
     except:
