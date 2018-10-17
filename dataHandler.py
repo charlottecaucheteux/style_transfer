@@ -42,7 +42,7 @@ def getDataLoader(data_dir, batch_size=4):
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                               data_transforms[x])
                       for x in ['train', 'valid']}
-    				  
+        			  
 
     dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
                                                  shuffle=True, num_workers=6)
@@ -59,16 +59,16 @@ def getDataLoader(data_dir, batch_size=4):
     # Retrieving or computing the scaling parameters as two lists (mean, std) of 3 values (R, G, B)
 def getScaleParameters(data_dir):
     try:
-    	# Trying to retrieve
-    	with open('scaleParams.P', 'rb') as input:
-    		return(pickle.load(input))
+        # Trying to retrieve
+        with open('scaleParams.P', 'rb') as input:
+            return(pickle.load(input))
     except:
-    	# If not present, computing.
+        # If not present, computing.
         print("Computing the parameters")
         params = computeScaleParameters(data_dir)
-    	# Writing for future use
-    	with open('scaleParams.P', 'wb') as output:
-    		pickle.dump(params, output)
+        # Writing for future use
+        with open('scaleParams.P', 'wb') as output:
+            pickle.dump(params, output)
         return params
 
     # Computing mean and variance from scratch
