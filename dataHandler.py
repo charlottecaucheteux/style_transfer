@@ -92,25 +92,29 @@ def computeScaleParameters(data_dir):
             width, height = image.size
             pixel_values = list(image.getdata())
 
+
             size = width*height
+            try:
+                r_values = [pixel_values[i][0] for i in range (size)]
+                g_values = [pixel_values[i][1] for i in range (size)]
+                b_values = [pixel_values[i][2] for i in range (size)]
 
-            r_values = [pixel_values[i][0] for i in range (size)]
-            g_values = [pixel_values[i][1] for i in range (size)]
-            b_values = [pixel_values[i][2] for i in range (size)]
+                r_values_sqr = [pixel_values[i][0]*2 for i in range (size)]
+                g_values_sqr = [pixel_values[i][1]*2 for i in range (size)]
+                b_values_sqr = [pixel_values[i][2]*2 for i in range (size)]
 
-            r_values_sqr = [pixel_values[i][0]*2 for i in range (size)]
-            g_values_sqr = [pixel_values[i][1]*2 for i in range (size)]
-            b_values_sqr = [pixel_values[i][2]*2 for i in range (size)]
 
-            n_pixels_glob += width*height
+                r_full_sum += sum(r_values)
+                g_full_sum += sum(g_values)
+                b_full_sum += sum(b_values)
 
-            r_full_sum += sum(r_values)
-            g_full_sum += sum(g_values)
-            b_full_sum += sum(b_values)
-
-            r_full_sumsquared += sum(r_values_sqr)
-            g_full_sumsquared += sum(g_values_sqr)
-            b_full_sumsquared += sum(b_values_sqr)
+                r_full_sumsquared += sum(r_values_sqr)
+                g_full_sumsquared += sum(g_values_sqr)
+                b_full_sumsquared += sum(b_values_sqr)
+                
+                n_pixels_glob += width*height
+            except:
+                pass
 
     # Computing mean and std from previous sums
     r_full_mean = r_full_sum/n_pixels_glob
