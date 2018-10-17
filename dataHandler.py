@@ -7,11 +7,16 @@ from PIL import ImageFile
 import pickle
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
+# input: directory of data organized with train/classes and valid/classes
+# output: dataloaders, data_sizes, class_names used later in computation. Data transformation is done on the fly.
 def getDataLoader(data_dir, batch_size=4):
 
+	# Computing scaling parameters
     rgb_mean, rgb_std = getScaleParameters(data_dir)
+	print("Normalizing the images with the following parameters for mean and std")
     print(rgb_mean, rgb_std)
 
+	# For the data augmentation
     data_transforms = {
         'train': transforms.Compose([
             transforms.RandomResizedCrop(224),
@@ -28,29 +33,37 @@ def getDataLoader(data_dir, batch_size=4):
         ]),
     }
 
-
+	# Creating ImageFolder object
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                               data_transforms[x])
                       for x in ['train', 'valid']}
+					  
+
     dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
                                                  shuffle=True, num_workers=6)
                       for x in ['train', 'valid']}
 
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'valid']}
     class_names = image_datasets['train'].classes
-    return dataloaders
+	
+	
+	# Returning dataloader and metadata only
+    return dataloaders, data_sizes, class_names
 
-
+# Retrieving or computing the scaling parameters as two lists (mean, std) of 3 values (R, G, B)
 def getScaleParameters(data_dir):
     try:
+		# Trying to retrieve
         params = pickle.load("scaleParams.P")
         return params
     except:
+		# If not present, computing.
         print("Computing the parameters")
         params = computeScaleParameters(data_dir)
         pickle.dump(params, "scaleParams.P")
         return params
 
+# Computing mean and variance from scratch
 def computeScaleParameters(data_dir):
     train_dir = os.path.join(data_dir, "train")
     n_pixels_glob = 0
@@ -63,6 +76,7 @@ def computeScaleParameters(data_dir):
     g_full_sumsquared=0
     b_full_sumsquared=0
 
+	# Reading all images, summing the values of the pixel and the value squared
     for class_folders in os.listdir(train_dir):
         class_folders_path = os.path.join(train_dir, class_folders)
         for imgName in os.listdir(class_folders_path):
@@ -90,7 +104,7 @@ def computeScaleParameters(data_dir):
             g_full_sumsquared += sum(g_values_sqr)
             b_full_sumsquared += sum(b_values_sqr)
 
-
+	# Computing mean and std from previous sums
     r_full_mean = r_full_sum/n_pixels_glob
     g_full_mean = g_full_sum/n_pixels_glob
     b_full_mean = b_full_sum/n_pixels_glob
@@ -101,6 +115,6 @@ def computeScaleParameters(data_dir):
 
     return [r_full_mean, g_full_mean, b_full_mean]/255, [r_full_std, g_full_std, b_full_std]/255
 
-# data_dir = 'D:/HEC/Cours/dpx/artLearningProject/dataset/'
+# data_dir = '/content/drive/My Drive/DeepLearningProject/data/classif_style1/'
 # getDataLoader(data_dir)
 
