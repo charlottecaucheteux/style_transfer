@@ -87,16 +87,16 @@ class FeaturesGenerator(object):
                 labels_list.extend(labels.data.cpu().numpy())
                 
                 if i % save_batch == 0:
-                    utils.save_array(save_dir_features, conv_features)
-                    utils.save_array(save_dir_labels, labels_list)
+                    save_array(save_dir_features, conv_features)
+                    save_array(save_dir_labels, labels_list)
 
             except (OSError, ValueError, IOError):
                 print(str(i) + " image is not used ! " )
              
         conv_features = np.concatenate([[feat] for feat in conv_features])
         #save the features in the good directory
-        utils.save_array(save_dir_features, conv_features)
-        utils.save_array(save_dir_labels, labels_list)   
+        save_array(save_dir_features, conv_features)
+        save_array(save_dir_labels, labels_list)   
             
         return (conv_features, labels_list) 
   
