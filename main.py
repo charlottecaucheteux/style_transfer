@@ -1,17 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Oct 18 13:54:16 2018
+
+@author: mathildelavacquery
+"""
+
 
 import argparse
 # import urllib
 from class_dataloader import *
-
-
+from features_generator import *
+from utils import *
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = 'Train/Run a ResNet/VGG Art Style classifier')
-    parser.add_argument('-o', '--is_organised', type = str, nargs = '?', help = 'Whether the training directory is already organized or not', default = 'False')
+    parser.add_argument('-o', '--is_organised', type = str, nargs = '?', help = 'Whether the training directory is already organized or not', default = 'True')
     parser.add_argument('-c', '--class_names', type = list, nargs = '?', help = 'Name of the raw data directory', default = ['impressionism', 'realism'])
-    parser.add_argument('-rd','--raw_data_dir', type = str, help = 'Name of the raw data directory')
+    parser.add_argument('-rd','--raw_data_dir', type = str, nargs= '?', help = 'Name of the raw data directory', default = 'None')
     parser.add_argument('-dd', '--data_dir', type = str, help = 'Name of the training directory')
+    parser.add_argument('-sc', '--computeScalingFromScratch', type = str, nargs = '?', help = 'True if we need to compute the scaling parameters from scratch', default = 'False')
+
+    parser.add_argument('-m', '--model', type = str, nargs = '?', help = 'model to use, either resnet or vgg16', default = 'resnet')
     args = parser.parse_args()
     
 
@@ -20,7 +31,6 @@ if __name__ == "__main__":
     #urllib.urlretrieve("https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip", filename= "")
     
     loader = Dataloader(args.is_organised, args.class_names, args.raw_data_dir, args.data_dir)
-    # print(loader.data_dir)
     if loader.is_organised == "False":
         print('ok')
         df1 = loader.organise_dataset(0.8, 1)
@@ -28,8 +38,14 @@ if __name__ == "__main__":
         df = df1.append(pd.DataFrame(data = df2), ignore_index=True)
         print('Train, valid repartition: ', df.groupby(['train_valid', 'style'])['filename'].count())
 
-    dataloader, data_sizes, class_names = loader.getDataLoader(loader.data_dir)
-
-    print(dataloader)
+    # Part 1 - dataloader
+    dataloader, data_sizes, class_names = loader.getDataLoader(loader.data_dir, args.computeScalingFromScratch)
+    
+    # Part 2 - Features Generator
+    output_dir = args.data_dir + '/resnet'
+    fg = FeaturesGenerator(args.model, dataloader, output_dir, use_gpu = False)
+    fg.generate()
+    fg.plotPCA(class_names)
+    
 
 
