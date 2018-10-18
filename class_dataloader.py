@@ -29,7 +29,7 @@ class Dataloader(nn.Module):
         df = pd.read_csv(self.raw_data_dir + '/train_info.csv')
         folder_path = self.data_dir + '/classif_' + self.class_names[0] + '_' + self.class_names[1]
         old_folder = self.raw_data_dir + '/train_' + str(i)
-        # créer le nouveau dossier rangé par style
+        # create le nouveau dossier ordered par style
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
