@@ -135,7 +135,7 @@ class Dataloader(nn.Module):
             with open('scaleParams.P', 'rb') as input:
                 return(pickle.load(input))
         except:
-            return(getScaleParameters(startFromScratch = True))
+            return(self.getScaleParameters(startFromScratch = True))
             # If not present, computing.
             
 
