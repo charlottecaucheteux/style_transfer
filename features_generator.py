@@ -107,10 +107,10 @@ class FeaturesGenerator(object):
         self.features, self.labels = features, labels
     
     
-    def plotPCA(self):
+    def plotPCA(self,class_names):
         X = np.array([x.flatten() for x in self.features])
         y = np.array(self.labels)
-        label_names = self.dataloader.class_names
+        label_names = class_names
         
         pca = PCA(n_components=2)
         X_pca = pca.fit(X).transform(X)
