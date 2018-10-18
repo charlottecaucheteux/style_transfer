@@ -50,8 +50,6 @@ class FeaturesGenerator(object):
                     
             # Parameters of newly constructed modules have requires_grad=True by default
             num_ftrs = model_resnet.fc.in_features
-            #a enlever non?
-            #model_resnet.fc = nn.Linear(512, 2)
             model_features_block = nn.Sequential(*list(model_resnet.children())[:-1])
          
         if self.model_type == 'vgg16':
@@ -62,7 +60,6 @@ class FeaturesGenerator(object):
 
             for param in model_vgg.parameters():
                 param.requires_grad = False
-                model_vgg.classifier._modules['6'] = nn.Linear(4096, 127)
             model_features_block = model_vgg.features
          
         
@@ -143,7 +140,13 @@ class FeaturesGenerator(object):
 
 
 if __name__ == 'main':
-    output_dir = 'data/classif_impressionism_realism/resnet_test'
-    fg = FeaturesGenerator('resnet', dataloaders, output_dir, use_gpu = True)
-    fg.generate()
-    fg.plotPCA()
+    output_dir = 'data/classif_impressionism_realism/vgg'
+    fg_vgg = FeaturesGenerator('vgg16', dataloaders, output_dir, use_gpu = True)
+    fg_vgg.generate()
+    fg_vgg.plotPCA()
+
+    output_dir = 'data/classif_impressionism_realism/resnet'
+    fg_resnet = FeaturesGenerator('resnet', dataloaders, output_dir, use_gpu = True)
+    fg_resnet.generate()
+    fg_resnet.plotPCA()
+ 
