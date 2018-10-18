@@ -95,8 +95,8 @@ class FeaturesGenerator(object):
              
         conv_features = np.concatenate([[feat] for feat in conv_features])
         #save the features in the good directory
-        save_array(save_dir_features, conv_features)
-        save_array(save_dir_labels, labels_list)   
+        utils.save_array(save_dir_features, conv_features)
+        utils.save_array(save_dir_labels, labels_list)   
             
         return (conv_features, labels_list) 
   
