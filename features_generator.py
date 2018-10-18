@@ -143,10 +143,10 @@ if __name__ == 'main':
     output_dir = 'data/classif_impressionism_realism/vgg'
     fg_vgg = FeaturesGenerator('vgg16', dataloaders, output_dir, use_gpu = True)
     fg_vgg.generate()
-    fg_vgg.plotPCA()
+    fg_vgg.plotPCA(class_names)
 
     output_dir = 'data/classif_impressionism_realism/resnet'
     fg_resnet = FeaturesGenerator('resnet', dataloaders, output_dir, use_gpu = True)
     fg_resnet.generate()
-    fg_resnet.plotPCA()
+    fg_resnet.plotPCA(class_names)
  
