@@ -1,14 +1,14 @@
-"# style classification" 
+# Style Classification
 
 
-1. download the data from these URL:
+### 1. download the data from these URL:
 https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip
 https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip
 https://www.kaggle.com/c/painter-by-numbers/data/train_info.csv
 
 ATTENTION : need to have a kaggle account and to approave the project
 
-2. unzip the files in the directory raw_data, organisation of the directory should be:
+### 2. unzip the files in the directory raw_data, organisation of the directory should be:
 
 |-main.py
 |-class_dataloader.py
@@ -25,4 +25,7 @@ ATTENTION : need to have a kaggle account and to approave the project
  the data folder will be generated automatically by the DataLoader
 
 
-3. run: python main.py -o False -rd raw_data -dd data
+### 3. run: 
+''''
+python main.py -o False -rd raw_data -dd data
+''''
