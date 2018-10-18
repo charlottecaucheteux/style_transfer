@@ -1,10 +1,10 @@
 "# style classification" 
 
 
-1. download the data from these URL :
-https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip
-https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip
-https://www.kaggle.com/c/painter-by-numbers/data/train_info.csv
+1. download the data from these URL :\n
+https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip \n
+https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip \n
+https://www.kaggle.com/c/painter-by-numbers/data/train_info.csv \n
 
 ATTENTION : need to have a kaggle account and to approave the project
 
