@@ -87,8 +87,8 @@ class FeaturesGenerator(object):
                 labels_list.extend(labels.data.cpu().numpy())
                 
                 if i % save_batch == 0:
-                    save_array(save_dir_features, conv_features)
-                    save_array(save_dir_labels, labels_list)
+                    utils.save_array(save_dir_features, conv_features)
+                    utils.save_array(save_dir_labels, labels_list)
 
             except (OSError, ValueError, IOError):
                 print(str(i) + " image is not used ! " )
