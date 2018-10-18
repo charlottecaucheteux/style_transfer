@@ -2,10 +2,13 @@ from torchvision import transforms,datasets
 import os
 import torch
 import numpy as np
+import pandas as pd
+import shutil
 from PIL import Image
 from PIL import ImageFile
 import pickle
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+import torch.nn as nn
 
 def save_img(x, folder):
     img = x['filename']
@@ -14,49 +17,47 @@ def save_img(x, folder):
     if not os.path.exists(new_image_path):
         shutil.copy(old_image_path, new_image_path)
 
+
+
 class Dataloader(nn.Module):
-    def __init__(self, is_organised, num_class, class_names, raw_data_dir, data_dir):
+    def __init__(self, is_organised,class_names, raw_data_dir, data_dir):
         self.is_organised = is_organised
-        self.num_class = num_class
         self.class_names = class_names
         self.raw_data_dir = raw_data_dir
-        self.data_dir = data_dir
+        self.data_dir = data_dir 
 
     # Dealing with the raw data
-    def organize_dataset(self, train_ratio):
+    def organise_dataset(self, train_ratio):
         df = pd.read_csv(self.raw_data_dir + '/train_info.csv')
-        if self.is_organised not True:
-            folder_path = self.data_dir + '/classif_' + self.class_names[0] + '_' + self.class_names[1]
+        folder_path = self.data_dir + '/classif_' + self.class_names[0] + '_' + self.class_names[1]
+        # créer le nouveau dossier rangé par style
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
 
-            # créer le nouveau dossier rangé par style
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+        images = [f for f in os.listdir(self.raw_data_dir) if os.path.isfile(os.path.join(self.raw_data_dir, f)) and f.endswith('.jpg')]
+        print(len(images))
 
-            images = [f for f in os.listdir(self.raw_data_dir) if os.path.isfile(os.path.join(self.raw_data_dir, f)) and f.endswith('.jpg')]
-            print(len(images))
+        # only keep the images that are in the folder to order
+        df = df[df['filename'].isin(images)]
 
-            # only keep the images that are in the folder to order
-            df = df[df['filename'].isin(images)]
+        # simplify style name
+        df['style'] = [str(styl).strip().replace(' ', '_').lower() for styl in df['style']]
 
-            # simplify style name
-            df['style'] = [str(styl).strip().replace(' ', '_').lower() for styl in df['style']]
+        # only keep the styles defined by class1 / class2
+        df = df[df['style'].isin(self.class_names)].reset_index(drop = True)
+        # create folder name in function of train/test split
+        df['nb_tot'] = df.groupby(['style'])['filename'].transform('count')
+        df['ind'] = df.groupby(['style']).cumcount()
+        df['train_valid'] = [folder_path + '/train/' if float(ind)/float(tot) < train_ratio else folder_path +'/valid/' for (ind,tot) in zip(df['ind'],df['nb_tot']) ]
+        df['folder_name'] = df['train_valid'] + df['style']
 
-            # only keep the styles defined by class1 / class2
-            df = df[df['style'].isin(self.class_names)].reset_index(drop = True)
+        for subfolder in list(df.folder_name.unique()):
+            print(subfolder)
+            if not os.path.exists(subfolder):
+                os.makedirs(subfolder)
 
-            # create folder name in function of train/test split
-            df['nb_tot'] = df.groupby(['style'])['filename'].transform('count')
-            df['ind'] = df.groupby(['style']).cumcount()
-            df['train_valid'] = [folder_path + '/train/' if float(ind)/float(tot) < train_ratio else folder_path +'/valid/' for (ind,tot) in zip(df['ind'],df['nb_tot']) ]
-            df['folder_name'] = df['train_valid'] + df['style']
-
-            for subfolder in list(df.folder_name.unique()):
-                print(subfolder)
-                if not os.path.exists(subfolder):
-                    os.makedirs(subfolder)
-
-            df.apply(lambda x : save_img(x, self.raw_data_dir), axis = 1)
-            self.is_organised = True
+        df.apply(lambda x : save_img(x, self.raw_data_dir), axis = 1)
+        self.is_organised = True
         return df
 
     # Retrieving or computing the scaling parameters as two lists (mean, std) of 3 values (R, G, B)
@@ -127,7 +128,7 @@ class Dataloader(nn.Module):
             # If not present, computing.
             print("Computing the parameters")
             train_dir = os.path.join(self.data_dir, "train")
-            params = computeScaleParameters(self.data_dir)
+            params = self.computeScaleParameters()
             # Writing for future use
             with open('scaleParams.P', 'wb') as output:
                 pickle.dump(params, output)
@@ -140,7 +141,9 @@ class Dataloader(nn.Module):
     def getDataLoader(self, batch_size=4):
 
         # Computing scaling parameters
-        rgb_mean, rgb_std = getScaleParameters(self.data_dir)
+        self.data_dir = self.data_dir + '/classif_' + self.class_names[0] + '_' + self.class_names[1]
+
+        rgb_mean, rgb_std = self.getScaleParameters()
         print("Normalizing the images with the following parameters for mean and std")
         print(rgb_mean, rgb_std)
 
@@ -176,7 +179,7 @@ class Dataloader(nn.Module):
 
 
         # Returning dataloader and metadata only
-        return dataloaders, data_sizes, class_names
+        return dataloaders, dataset_sizes, class_names
 
 
 # data_dir = '/content/drive/My Drive/DeepLearningProject/data/classif_style1/'
