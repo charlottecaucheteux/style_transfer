@@ -22,7 +22,7 @@ from torchvision import models,transforms,datasets
 import torch
 import bcolz
 import time
-import utils
+from utils import *
 
 
 class FeaturesGenerator(object):
