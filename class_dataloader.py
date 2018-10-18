@@ -72,10 +72,11 @@ class Dataloader(nn.Module):
         g_full_sumsquared=0
         b_full_sumsquared=0
         # Reading all images, summing the values of the pixel and the value squared
+        counter = 0
         for class_folders in os.listdir(train_dir):
             if class_folders != '.DS_Store':
                 class_folders_path = os.path.join(train_dir, class_folders)
-                for imgName in os.listdir(class_folders_path):
+                for imgName in os.listdir(class_folders_path)[0:300]:
                     try:
                         image = Image.open(os.path.join(class_folders_path, imgName))
                         width, height = image.size
@@ -84,14 +85,13 @@ class Dataloader(nn.Module):
 
                         size = width*height
                         try:
-                            r_values = [pixel_values[i][0] for i in range (size)]
-                            g_values = [pixel_values[i][1] for i in range (size)]
-                            b_values = [pixel_values[i][2] for i in range (size)]
+                            r_values = [float(pixel_values[i][0])/255 for i in range (size)]
+                            g_values = [float(pixel_values[i][1])/255 for i in range (size)]
+                            b_values = [float(pixel_values[i][2])/255 for i in range (size)]
 
-                            r_values_sqr = [pixel_values[i][0]*2 for i in range (size)]
-                            g_values_sqr = [pixel_values[i][1]*2 for i in range (size)]
-                            b_values_sqr = [pixel_values[i][2]*2 for i in range (size)]
-
+                            r_values_sqr = [math.pow((float(pixel_values[i][0])/255), 2) for i in range (size)]
+                            g_values_sqr = [math.pow((float(pixel_values[i][1])/255), 2) for i in range (size)]
+                            b_values_sqr = [math.pow((float(pixel_values[i][2])/255), 2) for i in range (size)]
 
                             r_full_sum += sum(r_values)
                             g_full_sum += sum(g_values)
@@ -102,29 +102,27 @@ class Dataloader(nn.Module):
                             b_full_sumsquared += sum(b_values_sqr)
 
                             n_pixels_glob += width*height
+                            if(counter % 100 == 0):
+                              print(str(counter) + " images have been processed.")
+                            counter += 1
                         except:
                             pass
                     except:
                         pass
         # Computing mean and std from previous sums
-        r_full_mean = r_full_sum/n_pixels_glob
-        g_full_mean = g_full_sum/n_pixels_glob
-        b_full_mean = b_full_sum/n_pixels_glob
+        r_full_mean = float(r_full_sum)/n_pixels_glob
+        g_full_mean = float(g_full_sum)/n_pixels_glob
+        b_full_mean = float(b_full_sum)/n_pixels_glob
 
-        r_full_std = r_full_sumsquared/n_pixels_glob - r_full_mean**2
-        g_full_std = g_full_sumsquared/n_pixels_glob - g_full_mean**2
-        b_full_std = b_full_sumsquared/n_pixels_glob - b_full_mean**2
+        r_full_std = float(r_full_sumsquared)/n_pixels_glob - r_full_mean**2
+        g_full_std = float(g_full_sumsquared)/n_pixels_glob - g_full_mean**2
+        b_full_std = float(b_full_sumsquared)/n_pixels_glob - b_full_mean**2
 
-        return [r_full_mean/255, g_full_mean/255, b_full_mean/255], [r_full_std/255, g_full_std/255, b_full_std/255]
+        return [r_full_mean, g_full_mean, b_full_mean], [r_full_std, g_full_std, b_full_std]
 
     # Check if the RGB scaling parameters have been computed
-    def getScaleParameters(self):
-        try:
-            # Trying to retrieve
-            with open('scaleParams.P', 'rb') as input:
-                return(pickle.load(input))
-        except:
-            # If not present, computing.
+    def getScaleParameters(self, startFromScratch = False):
+        if(startFromScratch):
             print("Computing the parameters")
             train_dir = os.path.join(self.data_dir, "train")
             params = self.computeScaleParameters()
@@ -132,17 +130,25 @@ class Dataloader(nn.Module):
             with open('scaleParams.P', 'wb') as output:
                 pickle.dump(params, output)
             return params
+        try:
+            # Trying to retrieve
+            with open('scaleParams.P', 'rb') as input:
+                return(pickle.load(input))
+        except:
+            return(getScaleParameters(startFromScratch = True))
+            # If not present, computing.
+            
 
     # DataLoader
     # input: directory of data organized with train/classes and valid/classes
     # output: dataloaders, data_sizes, class_names used later in computation. Data transformation is done on the fly.
 
-    def getDataLoader(self, batch_size=4):
+    def getDataLoader(self, batch_size=4, computeScalingFromScratch = False):
 
         # Computing scaling parameters
         self.data_dir = self.data_dir + '/classif_' + self.class_names[0] + '_' + self.class_names[1]
 
-        rgb_mean, rgb_std = self.getScaleParameters()
+        rgb_mean, rgb_std = self.getScaleParameters(computeScalingFromScratch)
         print("Normalizing the images with the following parameters for mean and std")
         print(rgb_mean, rgb_std)
 
