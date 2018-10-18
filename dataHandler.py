@@ -42,7 +42,7 @@ def getDataLoader(data_dir, batch_size=4):
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                               data_transforms[x])
                       for x in ['train', 'valid']}
-        			  
+
 
     dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
                                                  shuffle=True, num_workers=6)
@@ -65,6 +65,7 @@ def getScaleParameters(data_dir):
     except:
         # If not present, computing.
         print("Computing the parameters")
+        train_dir = os.path.join(data_dir, "train")
         params = computeScaleParameters(data_dir)
         # Writing for future use
         with open('scaleParams.P', 'wb') as output:
@@ -83,39 +84,41 @@ def computeScaleParameters(data_dir):
     r_full_sumsquared=0
     g_full_sumsquared=0
     b_full_sumsquared=0
-
     # Reading all images, summing the values of the pixel and the value squared
     for class_folders in os.listdir(train_dir):
-        class_folders_path = os.path.join(train_dir, class_folders)
-        for imgName in os.listdir(class_folders_path):
-            image = Image.open(os.path.join(class_folders_path, imgName))
-            width, height = image.size
-            pixel_values = list(image.getdata())
+        if class_folders != '.DS_Store':
+            class_folders_path = os.path.join(train_dir, class_folders)
+            for imgName in os.listdir(class_folders_path):
+                try:
+                    image = Image.open(os.path.join(class_folders_path, imgName))
+                    width, height = image.size
+                    pixel_values = list(image.getdata())
 
 
-            size = width*height
-            try:
-                r_values = [pixel_values[i][0] for i in range (size)]
-                g_values = [pixel_values[i][1] for i in range (size)]
-                b_values = [pixel_values[i][2] for i in range (size)]
+                    size = width*height
+                    try:
+                        r_values = [pixel_values[i][0] for i in range (size)]
+                        g_values = [pixel_values[i][1] for i in range (size)]
+                        b_values = [pixel_values[i][2] for i in range (size)]
 
-                r_values_sqr = [pixel_values[i][0]*2 for i in range (size)]
-                g_values_sqr = [pixel_values[i][1]*2 for i in range (size)]
-                b_values_sqr = [pixel_values[i][2]*2 for i in range (size)]
+                        r_values_sqr = [pixel_values[i][0]*2 for i in range (size)]
+                        g_values_sqr = [pixel_values[i][1]*2 for i in range (size)]
+                        b_values_sqr = [pixel_values[i][2]*2 for i in range (size)]
 
 
-                r_full_sum += sum(r_values)
-                g_full_sum += sum(g_values)
-                b_full_sum += sum(b_values)
+                        r_full_sum += sum(r_values)
+                        g_full_sum += sum(g_values)
+                        b_full_sum += sum(b_values)
 
-                r_full_sumsquared += sum(r_values_sqr)
-                g_full_sumsquared += sum(g_values_sqr)
-                b_full_sumsquared += sum(b_values_sqr)
-                
-                n_pixels_glob += width*height
-            except:
-                pass
+                        r_full_sumsquared += sum(r_values_sqr)
+                        g_full_sumsquared += sum(g_values_sqr)
+                        b_full_sumsquared += sum(b_values_sqr)
 
+                        n_pixels_glob += width*height
+                    except:
+                        pass
+                except:
+                    pass
     # Computing mean and std from previous sums
     r_full_mean = r_full_sum/n_pixels_glob
     g_full_mean = g_full_sum/n_pixels_glob
@@ -125,8 +128,7 @@ def computeScaleParameters(data_dir):
     g_full_std = g_full_sumsquared/n_pixels_glob - g_full_mean**2
     b_full_std = b_full_sumsquared/n_pixels_glob - b_full_mean**2
 
-    return [r_full_mean, g_full_mean, b_full_mean]/255, [r_full_std, g_full_std, b_full_std]/255
+    return [r_full_mean/255, g_full_mean/255, b_full_mean/255], [r_full_std/255, g_full_std/255, b_full_std/255]
 
 # data_dir = '/content/drive/My Drive/DeepLearningProject/data/classif_style1/'
 # getDataLoader(data_dir)
-
