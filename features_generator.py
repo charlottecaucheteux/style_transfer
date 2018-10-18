@@ -27,14 +27,6 @@ from utils import *
 
 class FeaturesGenerator(object):
     
-    def save_array(fname, arr):
-        c=bcolz.carray(arr, rootdir=fname, mode='w')
-        c.flush()
-
-    def load_array(fname):
-        return bcolz.open(fname)[:]
-
-
     def __init__(self, model_type, dataloader, output_dir, use_gpu = False):
         self.model_type = model_type #can be vgg or resnet
         self.dataloader = dataloader #dictionnaire avec train et valid dedans 
