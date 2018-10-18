@@ -104,7 +104,7 @@ class FeaturesGenerator(object):
             save_dir_features = os.path.join(self.output_dir, 'conv_feat_'+phase+'.bc')
             save_dir_labels = os.path.join(self.output_dir, 'labels_'+phase+'.bc')
             features, labels = self.compute_preconvfeat(model,dataset, save_dir_features, save_dir_labels)
-        self.features_train, self.labels_train = features
+        self.features, self.labels = features, labels
     
     
     def plotPCA(self):
