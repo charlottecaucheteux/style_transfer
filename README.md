@@ -19,22 +19,16 @@ ATTENTION : need to have a kaggle account and to approave the project
 |-class_trainer.py
 
 |-raw_data/
-
     |-train_1/
-    
     |-train_2/
-    
     |-train_info.csv
     
-|-data/
-
+|-data/ 
     |-classif_class1_class2/
-    
         |-train/
-        
         |-valid/
         
- the data folder will be generated automatically by the DataLoader
+ The data folder will be generated automatically by the DataLoader
 
 
 ### 3. run: 
