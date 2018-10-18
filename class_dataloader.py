@@ -122,7 +122,7 @@ class Dataloader(nn.Module):
 
     # Check if the RGB scaling parameters have been computed
     def getScaleParameters(self, startFromScratch = False):
-        if(startFromScratch):
+        if startFromScratch == 'True':
             print("Computing the parameters")
             train_dir = os.path.join(self.data_dir, "train")
             params = self.computeScaleParameters()
@@ -145,9 +145,9 @@ class Dataloader(nn.Module):
 
     def getDataLoader(self, batch_size=4, computeScalingFromScratch = False):
 
-        # Computing scaling parameters
         self.data_dir = self.data_dir + '/classif_' + self.class_names[0] + '_' + self.class_names[1]
 
+        # Computing scaling parameters
         rgb_mean, rgb_std = self.getScaleParameters(computeScalingFromScratch)
         print("Normalizing the images with the following parameters for mean and std")
         print(rgb_mean, rgb_std)
