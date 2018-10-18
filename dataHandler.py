@@ -111,10 +111,10 @@ def computeScaleParameters(data_dir):
                 r_full_sumsquared += sum(r_values_sqr)
                 g_full_sumsquared += sum(g_values_sqr)
                 b_full_sumsquared += sum(b_values_sqr)
-                
+
                 n_pixels_glob += width*height
-            except:
-                pass
+            except TypeError:
+                print(r_values)
 
     # Computing mean and std from previous sums
     r_full_mean = r_full_sum/n_pixels_glob
