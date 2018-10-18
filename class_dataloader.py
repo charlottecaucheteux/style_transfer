@@ -17,8 +17,6 @@ def save_img(x, folder):
     if not os.path.exists(new_image_path):
         shutil.copy(old_image_path, new_image_path)
 
-
-
 class Dataloader(nn.Module):
     def __init__(self, is_organised,class_names, raw_data_dir, data_dir):
         self.is_organised = is_organised
@@ -27,14 +25,15 @@ class Dataloader(nn.Module):
         self.data_dir = data_dir 
 
     # Dealing with the raw data
-    def organise_dataset(self, train_ratio):
+    def organise_dataset(self, train_ratio, i = 1):
         df = pd.read_csv(self.raw_data_dir + '/train_info.csv')
         folder_path = self.data_dir + '/classif_' + self.class_names[0] + '_' + self.class_names[1]
+        old_folder = self.raw_data_dir + '/train_' + str(i)
         # créer le nouveau dossier rangé par style
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-        images = [f for f in os.listdir(self.raw_data_dir) if os.path.isfile(os.path.join(self.raw_data_dir, f)) and f.endswith('.jpg')]
+        images = [f for f in os.listdir(old_folder) if os.path.isfile(os.path.join(old_folder, f)) and f.endswith('.jpg')]
         print(len(images))
 
         # only keep the images that are in the folder to order
@@ -56,7 +55,7 @@ class Dataloader(nn.Module):
             if not os.path.exists(subfolder):
                 os.makedirs(subfolder)
 
-        df.apply(lambda x : save_img(x, self.raw_data_dir), axis = 1)
+        df.apply(lambda x : save_img(x, old_folder), axis = 1)
         self.is_organised = True
         return df
 

@@ -23,7 +23,10 @@ if __name__ == "__main__":
     # print(loader.data_dir)
     if loader.is_organised == "False":
         print('ok')
-        df = loader.organise_dataset(0.8)
+        df1 = loader.organise_dataset(0.8, 1)
+        df2 = loader.organise_dataset(0.8, 2)
+        df = df1.append(pd.DataFrame(data = df2), ignore_index=True)
+        print('Train, valid repartition: ', df.groupby(['train_valid', 'style'])['filename'].count())
 
     dataloader, data_sizes, class_names = loader.getDataLoader(loader.data_dir)
 
