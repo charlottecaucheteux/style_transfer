@@ -6,6 +6,8 @@ Created on Thu Oct 18 13:54:16 2018
 @author: charlotte.caucheteux
 """
 
+#import the packages
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,17 +27,21 @@ import time
 class FeaturesGenerator(object):
     
     def __init__(self, model_type, dataloader, output_dir, use_gpu = False):
-        self.model_type = model_type
+        self.model_type = model_type #can be vgg or resnet
         self.dataloader = dataloader #dictionnaire avec train et valid dedans 
-        self.output_dir = output_dir
+        self.output_dir = output_dir #path where to save the computed features
         self.use_gpu = use_gpu
-        self.model = None
-        self.features = None
-        self.labels = None
+        self.model = None #gives the group of layers that are going to be frozen
+        self.features = None #features only for the train part, used for the PCA
+        self.labels = None #labels only for the train part, used for the PCA
 
+
+
+    #Returns the frozen layers, from which we are going to compute and save the features
     def get_preconvfeat_model(self):
         
         if self.model_type == 'resnet':
+            #if the model is resnet, we freeze all the layers except the last one
             model_resnet = torchvision.models.resnet18(pretrained=True)
             if self.use_gpu:
                 model_resnet = model_resnet.cuda()
@@ -44,10 +50,12 @@ class FeaturesGenerator(object):
                     
             # Parameters of newly constructed modules have requires_grad=True by default
             num_ftrs = model_resnet.fc.in_features
-            model_resnet.fc = nn.Linear(512, 2)
+            #a enlever non?
+            #model_resnet.fc = nn.Linear(512, 2)
             model_features_block = nn.Sequential(*list(model_resnet.children())[:-1])
          
         if self.model_type == 'vgg16':
+            #if the model is vgg, we freeze the first group of layers : classifiers
             model_vgg = models.vgg16(pretrained=True)
             if self.use_gpu:
                 model_vgg = model_vgg.cuda()
@@ -61,14 +69,15 @@ class FeaturesGenerator(object):
         self.model = model_features_block
         return(model_features_block)
         
+
+    # compute the features at the end of the frozen layers    
     def compute_preconvfeat(self, model, dataset, save_dir_features, save_dir_labels, save_batch = 10):
         conv_features = []
         labels_list   = []
         i = 0
-        print(len(dataset))
+
         for data in dataset:
             i = i + 1
-            print(i)
             try : 
                 inputs, labels = data
                 if self.use_gpu:
@@ -76,8 +85,6 @@ class FeaturesGenerator(object):
                 else:
                     inputs , labels = Variable(inputs),Variable(labels)
                 x = model(inputs)
-                print(x)
-                #pdb.set_trace()
                 conv_features.extend(x.data.cpu().numpy())
                 labels_list.extend(labels.data.cpu().numpy())
                 
@@ -89,11 +96,14 @@ class FeaturesGenerator(object):
                 print(str(i) + " image is not used ! " )
              
         conv_features = np.concatenate([[feat] for feat in conv_features])
+        #save the features in the good directory
         save_array(save_dir_features, conv_features)
         save_array(save_dir_labels, labels_list)   
             
         return (conv_features, labels_list) 
   
+
+    #generates and saves the features for the frozen layers, calling the previous functions
     def generate(self):
         model = self.get_preconvfeat_model()
         if not os.path.exists(self.output_dir):
@@ -107,6 +117,8 @@ class FeaturesGenerator(object):
         self.features, self.labels = features, labels
     
     
+
+    #plots the PCA for the train dataset with the two classes : impressionism and realism
     def plotPCA(self,class_names):
         X = np.array([x.flatten() for x in self.features])
         y = np.array(self.labels)
