@@ -23,7 +23,7 @@ ATTENTION : need to have a kaggle account and to approave the project
 │   └── valid
 ├── main.py
 ├── class_dataloader.py
-├── class_trainer.py
+├── features_generat.py
 ├── 
 └── 
 ```

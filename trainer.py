@@ -7,102 +7,108 @@ Created on Thu Oct 18 13:54:33 2018
 """
 
 class Trainer(object):
+  
+  def __init__(self, model,
+               sizes, class_names,
+               m_softm = nn.Softmax(dim=1),  
+               criterion = nn.CrossEntropyLoss(), 
+               learning_rate = 0.01,
+               optimizer = torch.optim.SGD(model_vgg.classifier[6].parameters(),lr = 0.01), use_gpu = False):
+      self.model = model #has to be from Model class
+      self.sizes = sizes
+      self.class_names = class_names
+      self.m_softm = m_softm
+      self.criterion = criterion
+      self.optimizer = optimizer
+      self.learning_rate = learning_rate
+      self.conv_feat_dic = None
+      self.labels_dic = None
+      self.losses = None
+      self.accuracies = None
+      self.use_gpu = use_gpu
     
-    def __init__(self, input_path, size_dic, model_type = 'vgg'):
-        self.model_type = model_type
-        self.input_path = input_path
-        self.size_dic = size_dic
-        self.losses = None
-        self.conv_feat_train = None
-        self.labels_train = None
-        self.conv_feat_val = None
-        self.labels_val = None
-        self.model = None
-      
-    #TODOOOO
-    def init_model(self):
-        if self.model_type == 'vgg':
-            kjh
-            
-    def data_gen(self, conv_feat,labels,batch_size=64,shuffle=True):
-        labels = np.array(labels)
-        if shuffle:
-            index = np.random.permutation(len(conv_feat))
-            conv_feat = conv_feat[index]
-            labels = labels[index]
-        for idx in range(0,len(conv_feat),batch_size):
-            yield(conv_feat[idx:idx+batch_size],labels[idx:idx+batch_size])
+  def load_inputs(self, save_dir_features_dic, save_dir_labels_dic):
+      conv_feat_dic = {}
+      labels_dic = {}
+      for phase in ['train', 'valid']:
+          conv_feat_dic[phase] = load_array(save_dir_features_dic[phase])
+          labels_dic[phase] = load_array(save_dir_labels_dic[phase])
+      self.conv_feat_dic = conv_feat_dic
+      self.labels_dic = labels_dic
+      return(conv_feat_dic, labels_dic)
+    
+  def data_gen(self, conv_feat, labels, batch_size=64,shuffle=True):
+      labels = np.array(labels)
+      if shuffle:
+          index = np.random.permutation(len(conv_feat))
+          conv_feat = conv_feat[index]
+          labels = labels[index]
+      for idx in range(0,len(conv_feat),batch_size):
+          yield(conv_feat[idx:idx+batch_size],labels[idx:idx+batch_size]) 
         
-    def load_features(self):
-        self.conv_feat_train = load_array(data_dir+'/resnet/conv_feat_train.bc')
-        self.labels_train = load_array(data_dir+'/resnet/labels_train.bc')
-        self.conv_feat_val = load_array(data_dir+'/resnet/conv_feat_val.bc')
-        self.labels_val = load_array(data_dir+'/resnet/labels_val.bc')
-    
-    
-    def train(self, model, size_dic, conv_feat=None,labels=None,epochs=1,optimizer=None,train=True,shuffle=True):
-              #model, size_dic, conv_feat=None,labels=None,epochs=1,optimizer=None,train=True,shuffle=True):
-        self.load_features()
-        
-        losses = {}
-        accuracies = {}
-        for phase in ['train', 'valid']:
+   
+  def train(self, epochs=10, shuffle=True):
+      losses = {}
+      accuracies = {}
+      for phase in ['train', 'valid']:
           losses[phase] = []
           accuracies[phase] = []
-            
-        for epoch in range(epochs):
-            for phase in ['train', 'valid']:
-                if phase == 'train':
-                    model.train()
-                else:
-                    model.eval()
-                batches = data_gen(conv_feat=conv_feat[phase],labels=labels[phase],shuffle=shuffle)
-                total = 0
-                running_loss = 0.0
-                running_corrects = 0
-                for inputs,classes in batches:
-                    if use_gpu:
-                        inputs , classes = torch.from_numpy(inputs).cuda(), torch.from_numpy(classes).cuda()
-                    else:
-                        inputs , classes = torch.from_numpy(inputs), torch.from_numpy(classes)
-    
-                    inputs = inputs.view(inputs.size(0), -1)
-                    outputs = model(inputs) #contain weights
-                    loss = criterion(outputs, classes)           
-                    #if train:
-                    if phase == 'train':
-                        if optimizer is None:
-                            raise ValueError('Pass optimizer for train mode')
-                        optimizer = optimizer
-                        optimizer.zero_grad()
-                        ##loss.backward() compute the gradient automatically for all the network 
-                        loss.backward() ##gradient
-                        optimizer.step() ##step of the optimizer
-                    _,preds = torch.max(outputs.data,1)
-                    # statistics
-                    running_loss += loss.data.item()
-                    running_corrects += torch.sum(preds == classes.data)
-    
-                epoch_loss = running_loss / size_dic[phase]
-                epoch_acc = running_corrects.data.item() / size_dic[phase]
-                print(phase + ' - Loss: {:.4f} Acc: {:.4f}'.format(
-                             epoch_loss, epoch_acc))
-                losses[phase].append(epoch_loss)
-                accuracies[phase].append(epoch_acc)
-        self.losses = losses
-        self.accuracies = accuracies
-    return(losses, accuracies)
-    
-    def plot_losses(self):
-        dic = self.accuracies
-        title = 'Loss curves rgd the number of epochs'
-        yt = dic['train']
-        yv = dic['valid']
-        x = range(len(yt))
-        plt.plot(x, yt, 'r', label = 'train')
-        plt.plot(x, yv, 'b', label = 'valid')
-        plt.title(title)
-        plt.legend()
-        plt.show()        
+          
+      for epoch in range(epochs):
+          for phase in ['train', 'valid']:
+              if phase == 'train':
+                  self.model.train()
+              else:
+                  self.model.eval()
+              batches = self.data_gen(conv_feat=self.conv_feat_dic[phase],labels=self.labels_dic[phase],shuffle=True)
+              total = 0
+              running_loss = 0.0
+              running_corrects = 0
+              for inputs, classes in batches:
+                  if self.use_gpu:
+                      inputs , classes = torch.from_numpy(inputs).cuda(), torch.from_numpy(classes).cuda()
+                  else:
+                      inputs , classes = torch.from_numpy(inputs), torch.from_numpy(classes)
+                 
+                  inputs = inputs.view(inputs.size(0), -1)
+                  outputs = self.model(inputs) #contain weights
+                  loss = criterion(outputs, classes)  
+                  #if train:
+                  if phase == 'train':
+                      if self.optimizer is None:
+                          raise ValueError('Pass optimizer for train mode')
+                      self.optimizer.zero_grad()
+                      ##loss.backward() compute the gradient automatically for all the network 
+                      loss.backward() ##gradient
+                      self.optimizer.step() ##step of the optimizer
+                  _,preds = torch.max(outputs.data,1)
+                  # statistics
+                  running_loss += loss.data.item()
+                  running_corrects += torch.sum(preds == classes.data)
 
-    
+              epoch_loss = running_loss / self.sizes[phase]
+              epoch_acc = running_corrects.data.item() / self.sizes[phase]
+              print(phase + ' - Loss: {:.4f} Acc: {:.4f}'.format(
+                           epoch_loss, epoch_acc))
+              losses[phase].append(epoch_loss)
+              accuracies[phase].append(epoch_acc)
+      self.losses = losses
+      self.accuracies = accuracies
+      return(losses, accuracies)
+  
+  def plot_measures(self, measure = 'loss'):
+      if measure == 'loss':
+          dic = self.losses
+          title = 'Loss curves rgd the number of epochs'
+      if measure == 'accuracy':
+          dic = self.accuracies
+          title = 'Accuracy curves rgd the number of epochs'
+
+      yt = dic['train']
+      yv = dic['valid']
+      x = range(len(yt))
+      plt.plot(x, yt, 'r', label = 'train')
+      plt.plot(x, yv, 'b', label = 'valid')
+      plt.title(title)
+      plt.legend()
+      plt.show()     
