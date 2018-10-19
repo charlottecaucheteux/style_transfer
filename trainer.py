@@ -6,11 +6,6 @@ Created on Thu Oct 18 13:54:33 2018
 @author: charlotte.caucheteux
 """
 
-m_softm = nn.Softmax(dim=1)
-criterion = nn.CrossEntropyLoss()
-lr = 0.01
-optimizer_vgg = torch.optim.SGD(model_vgg.classifier[6].parameters(),lr = lr)
-
 class Trainer(object):
   
   def __init__(self, model,
