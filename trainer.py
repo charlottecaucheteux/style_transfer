@@ -28,6 +28,7 @@ class Trainer(object):
                criterion = nn.CrossEntropyLoss(), 
                learning_rate = 0.01,
                use_gpu = False):
+      print("oij")
       self.model = model #has to be from Model class
       self.sizes = sizes
       self.class_names = class_names

@@ -45,7 +45,6 @@ class Model(object):
       
       if self.model_type == 'resnet':
           model_resnet = models.resnet18(pretrained=True)
-          model_resnet = model_resnet.to(device)
           for param in model_resnet.parameters():
               param.requires_grad = False
 
