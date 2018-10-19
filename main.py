@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 18 13:54:16 2018
-
-@author: mathildelavacquery
-"""
-
 
 import argparse
 # import urllib
 from class_dataloader import *
 from features_generator import *
+from trainer import *
+from model import *
 from utils import *
 
 
@@ -48,15 +44,18 @@ if __name__ == "__main__":
         fg.generate()
         fg.plotPCA(class_names)
    
-    conv_feat_train = load_array(output_dir +'/conv_feat_train.bc')
-    labels_train = load_array(output_dir+'/labels_train.bc')
-    conv_feat_val = load_array(output_dir+'/conv_feat_valid.bc')
-    labels_val = load_array(output_dir+'/labels_valid.bc')
+    save_dir_features_dic = {'train' : output_dir+'/conv_feat_train.bc', 'valid' : output_dir+'/conv_feat_valid.bc'}
+    save_dir_labels_dic   = {'train' : output_dir+'/labels_train.bc', 'valid' : output_dir+'/labels_valid.bc'}
 
+    # Part 3 - set up the model
+    m = Model(agrs.model)
+    m.load_and_tune()
+    fb = m.features_block
+    classifier = m.classif_block
 
-
-    # Part 3 - train the model 
-
+    # Part 4 - train the model
+    
+    
     
 
 
