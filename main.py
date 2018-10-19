@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 18 13:54:16 2018
-
-@author: mathildelavacquery
-"""
-
 
 import argparse
 # import urllib
 from class_dataloader import *
 from features_generator import *
+from trainer import *
+from model import *
 from utils import *
 
 
@@ -21,8 +17,8 @@ if __name__ == "__main__":
     parser.add_argument('-rd','--raw_data_dir', type = str, nargs= '?', help = 'Name of the raw data directory', default = 'None')
     parser.add_argument('-dd', '--data_dir', type = str, help = 'Name of the training directory')
     parser.add_argument('-sc', '--computeScalingFromScratch', type = str, nargs = '?', help = 'True if we need to compute the scaling parameters from scratch', default = 'False')
-
     parser.add_argument('-m', '--model', type = str, nargs = '?', help = 'model to use, either resnet or vgg16', default = 'resnet')
+    parser.add_argument('-gf', '--generate_features', type = str, nargs = '?', help ='True to generate, False to use the already generated features', default = 'False')
     args = parser.parse_args()
     
 
@@ -42,10 +38,28 @@ if __name__ == "__main__":
     dataloader, data_sizes, class_names = loader.getDataLoader(loader.data_dir, args.computeScalingFromScratch)
     
     # Part 2 - Features Generator
-    output_dir = args.data_dir + '/resnet'
-    fg = FeaturesGenerator(args.model, dataloader, output_dir, use_gpu = False)
-    fg.generate()
-    fg.plotPCA(class_names)
+    output_dir = args.data_dir + '/' args.model
+    if args.generate_features == 'True':
+        fg = FeaturesGenerator(args.model, dataloader, output_dir, use_gpu = False)
+        fg.generate()
+        fg.plotPCA(class_names)
+   
+    save_dir_features_dic = {'train' : output_dir+'/conv_feat_train.bc', 'valid' : output_dir+'/conv_feat_valid.bc'}
+    save_dir_labels_dic   = {'train' : output_dir+'/labels_train.bc', 'valid' : output_dir+'/labels_valid.bc'}
+
+    # Part 3 - set up the model
+    m = Model(agrs.model)
+    m.load_and_tune()
+    fb = m.features_block
+    classifier = m.classif_block
+
+    # Part 4 - train the model
+    
+    
     
 
 
+
+
+   
+        
