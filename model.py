@@ -29,6 +29,7 @@ class Model(object):
       self.epoch = 0 #number of epochs, 10 for vgg16, 200 for resnet
 
   def load_and_tune(self):
+      print("fonction to load and tune")
       if self.model_type == 'vgg16':
           model_vgg = models.vgg16(pretrained=True)
           if self.use_gpu:
