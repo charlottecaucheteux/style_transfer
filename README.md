@@ -6,7 +6,7 @@ https://drive.google.com/drive/folders/1TxWlhFs9hKlKEzAbL6Mw6PHLIWjCF7-w?usp=sha
 
 ### 2. You can run directly the notebook : Notebook art classification project, in the drive 
 
-
+## OR 
 
 ### 1. Download the data from these URL:
 https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip
