@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 
 class Model(object):
   
-  def __init__(self, model_type, use_gpu = True):
+  def __init__(self, model_type, use_gpu = False):
       self.model_type = model_type #can be vgg16 or resnet
       self.use_gpu = use_gpu
       self.model = None #returns the whole model pretrained
