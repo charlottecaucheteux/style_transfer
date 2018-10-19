@@ -19,7 +19,7 @@ import pickle
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
-
+print("hello")
 class Model(object):
   
   def __init__(self, model_type, use_gpu = True):
