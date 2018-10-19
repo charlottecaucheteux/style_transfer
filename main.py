@@ -21,8 +21,8 @@ if __name__ == "__main__":
     parser.add_argument('-rd','--raw_data_dir', type = str, nargs= '?', help = 'Name of the raw data directory', default = 'None')
     parser.add_argument('-dd', '--data_dir', type = str, help = 'Name of the training directory')
     parser.add_argument('-sc', '--computeScalingFromScratch', type = str, nargs = '?', help = 'True if we need to compute the scaling parameters from scratch', default = 'False')
-
     parser.add_argument('-m', '--model', type = str, nargs = '?', help = 'model to use, either resnet or vgg16', default = 'resnet')
+    parser.add_argument('-gf', '--generate_features', type = str, nargs = '?', help ='True to generate, False to use the already generated features', default = 'False')
     args = parser.parse_args()
     
 
@@ -42,10 +42,25 @@ if __name__ == "__main__":
     dataloader, data_sizes, class_names = loader.getDataLoader(loader.data_dir, args.computeScalingFromScratch)
     
     # Part 2 - Features Generator
-    output_dir = args.data_dir + '/resnet'
-    fg = FeaturesGenerator(args.model, dataloader, output_dir, use_gpu = False)
-    fg.generate()
-    fg.plotPCA(class_names)
+    output_dir = args.data_dir + '/' args.model
+    if args.generate_features == 'True':
+        fg = FeaturesGenerator(args.model, dataloader, output_dir, use_gpu = False)
+        fg.generate()
+        fg.plotPCA(class_names)
+   
+    conv_feat_train = load_array(output_dir +'/conv_feat_train.bc')
+    labels_train = load_array(output_dir+'/labels_train.bc')
+    conv_feat_val = load_array(output_dir+'/conv_feat_valid.bc')
+    labels_val = load_array(output_dir+'/labels_valid.bc')
+
+
+
+    # Part 3 - train the model 
+
     
 
 
+
+
+   
+        
