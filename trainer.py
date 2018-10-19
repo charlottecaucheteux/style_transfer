@@ -1,32 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 18 13:54:33 2018
-
-@author: charlotte.caucheteux
-"""
 
 class Trainer(object):
-  
+
   def __init__(self, model,
                sizes, class_names,
-               m_softm = nn.Softmax(dim=1),  
-               criterion = nn.CrossEntropyLoss(), 
+               m_softm = nn.Softmax(dim=1),
+               criterion = nn.CrossEntropyLoss(),
                learning_rate = 0.01,
-               optimizer = torch.optim.SGD(model_vgg.classifier[6].parameters(),lr = 0.01), use_gpu = False):
+               use_gpu = False):
       self.model = model #has to be from Model class
       self.sizes = sizes
       self.class_names = class_names
       self.m_softm = m_softm
       self.criterion = criterion
-      self.optimizer = optimizer
+      #self.optimizer = optimizer
       self.learning_rate = learning_rate
       self.conv_feat_dic = None
       self.labels_dic = None
       self.losses = None
       self.accuracies = None
       self.use_gpu = use_gpu
-    
+
   def load_inputs(self, save_dir_features_dic, save_dir_labels_dic):
       conv_feat_dic = {}
       labels_dic = {}
@@ -36,7 +31,7 @@ class Trainer(object):
       self.conv_feat_dic = conv_feat_dic
       self.labels_dic = labels_dic
       return(conv_feat_dic, labels_dic)
-    
+
   def data_gen(self, conv_feat, labels, batch_size=64,shuffle=True):
       labels = np.array(labels)
       if shuffle:
@@ -44,50 +39,52 @@ class Trainer(object):
           conv_feat = conv_feat[index]
           labels = labels[index]
       for idx in range(0,len(conv_feat),batch_size):
-          yield(conv_feat[idx:idx+batch_size],labels[idx:idx+batch_size]) 
-        
-   
+          yield(conv_feat[idx:idx+batch_size],labels[idx:idx+batch_size])
+
+
   def train(self, epochs=10, shuffle=True):
       losses = {}
       accuracies = {}
       for phase in ['train', 'valid']:
           losses[phase] = []
           accuracies[phase] = []
-          
+
       for epoch in range(epochs):
           for phase in ['train', 'valid']:
               if phase == 'train':
-                  self.model.train()
+                  self.model.model.train()
               else:
-                  self.model.eval()
+                  self.model.model.eval()
               batches = self.data_gen(conv_feat=self.conv_feat_dic[phase],labels=self.labels_dic[phase],shuffle=True)
               total = 0
               running_loss = 0.0
-              running_corrects = 0
+              running_corrects = 0.0
               for inputs, classes in batches:
                   if self.use_gpu:
                       inputs , classes = torch.from_numpy(inputs).cuda(), torch.from_numpy(classes).cuda()
                   else:
                       inputs , classes = torch.from_numpy(inputs), torch.from_numpy(classes)
-                 
+
+                  if self.model.use_gpu:
+                    self.model.model = self.model.model.cuda()
                   inputs = inputs.view(inputs.size(0), -1)
-                  outputs = self.model(inputs) #contain weights
-                  loss = criterion(outputs, classes)  
+                  outputs = self.model.classif_block(inputs) #contain weights
+                  loss = self.criterion(outputs, classes)
                   #if train:
                   if phase == 'train':
-                      if self.optimizer is None:
+                      if self.model.optimizer is None:
                           raise ValueError('Pass optimizer for train mode')
-                      self.optimizer.zero_grad()
-                      ##loss.backward() compute the gradient automatically for all the network 
+                      self.model.optimizer.zero_grad()
                       loss.backward() ##gradient
-                      self.optimizer.step() ##step of the optimizer
+                      self.model.optimizer.step() ##step of the optimizer
                   _,preds = torch.max(outputs.data,1)
                   # statistics
                   running_loss += loss.data.item()
                   running_corrects += torch.sum(preds == classes.data)
 
+
               epoch_loss = running_loss / self.sizes[phase]
-              epoch_acc = running_corrects.data.item() / self.sizes[phase]
+              epoch_acc = float(running_corrects.data.item()) / float(self.sizes[phase])
               print(phase + ' - Loss: {:.4f} Acc: {:.4f}'.format(
                            epoch_loss, epoch_acc))
               losses[phase].append(epoch_loss)
@@ -95,7 +92,7 @@ class Trainer(object):
       self.losses = losses
       self.accuracies = accuracies
       return(losses, accuracies)
-  
+
   def plot_measures(self, measure = 'loss'):
       if measure == 'loss':
           dic = self.losses
@@ -111,4 +108,30 @@ class Trainer(object):
       plt.plot(x, yv, 'b', label = 'valid')
       plt.title(title)
       plt.legend()
-      plt.show()     
+      plt.show()
+
+  def predict_test_set(self):
+      loss_fn = torch.nn.CrossEntropyLoss()
+      batches = self.data_gen(conv_feat=self.conv_feat_dic['valid'],labels=self.labels_dic['valid'],shuffle=True)
+      running_corrects = 0.0
+      running_loss = 0.0
+      size = 0
+
+      for data in batches:
+          inputs, labels = data
+          bs = labels.size(0)
+
+          if use_gpu:
+              inputs.cuda()
+
+          outputs = self.model(inputs)
+
+          loss = loss_fn(outputs, labels)
+
+          _, preds = torch.max(outputs.data, 1)
+
+          running_loss += loss.data.item()
+          running_corrects += torch.sum(preds == labels.data)
+          size += bs
+
+      print('Test - Loss: {:.4f} Acc: {:.4f}'.format(running_loss / size, running_corrects.item() / size))
