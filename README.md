@@ -1,6 +1,13 @@
 # Style Classification
 
 
+### 1. Use our drive (data and functions are already downloaded) : 
+https://drive.google.com/drive/folders/1TxWlhFs9hKlKEzAbL6Mw6PHLIWjCF7-w?usp=sharing
+
+### 2. You can run directly the notebook : Notebook art classification project, in the drive 
+
+
+
 ### 1. Download the data from these URL:
 https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip
 
