@@ -1,6 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+import torch
 import torch.nn as nn
+from torch.autograd import Variable
+import torchvision
+from torchvision import models,transforms,datasets
+import bcolz
+import time
+import imp
+import utils; imp.reload(utils)
+import pickle
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+
 class Trainer(object):
   
   def __init__(self, model,
