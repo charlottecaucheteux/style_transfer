@@ -56,14 +56,14 @@ python main.py -dd data
 ```
 Parameters available:
 ```bash
-'-gpu', '--use_gpu'       Whether to use GPU or not, default = False
-'-o', '--is_organised'    Whether the directory is already organised or not, default = True
-'-c', '--class_names'     Painting styles to classify, default = ['impressionism', 'realism']
-'-rd','--raw_data_dir'    Name of the raw_data directory where the dataset has been unziped, default = 'None'
-'-dd', '--data_dir'       Name of the data directory, compulsory
-'-sc', '--computeScalingFromScratch'
-'-m', '--model'
-'-gf', '--generate_features'
+'-gpu', '--use_gpu'          Whether to use GPU or not, default = False
+'-o', '--is_organised'       Whether the directory is already organised or not, default = True
+'-c', '--class_names'        Painting styles to classify, default = ['impressionism', 'realism']
+'-rd','--raw_data_dir'       Name of the raw_data directory where the dataset has been unziped, default = 'None'
+'-dd', '--data_dir'          Name of the data directory, compulsory
+'-sc', '--computeScalingFromScratch' False to use directly scalesParams.P to normalize the data, True to compute them from scratch, default = 'False'
+'-m', '--model'              Name of the model to use, either 'resnet' (ResNet18) or 'vgg16'
+'-gf', '--generate_features' False to used the features already computed, True to compute them from scratch, default = False
 ```
 
 ## Acknowledgments
