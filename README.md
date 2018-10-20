@@ -1,6 +1,8 @@
 # Style Classification
 
-This project aims at classify paintings according to their style.
+This project aims at classify paintings according to their style. We reached 68% of accuracy on a test set of 20% of the images while trying to distinguish impressionism from realism.
+
+We used a deep learning approach, with transfer learning from a VGG19 and a residual neural network (ResNet18).
 
 ## Getting Started
 
