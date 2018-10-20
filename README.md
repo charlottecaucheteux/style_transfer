@@ -63,7 +63,7 @@ Parameters available:
 '-dd', '--data_dir'          Name of the data directory, compulsory
 '-sc', '--computeScalingFromScratch' False to use directly scalesParams.P to normalize the data, True to compute them from scratch, default = 'False'
 '-m', '--model'              Name of the model to use, either 'resnet' (ResNet18) or 'vgg16'
-'-gf', '--generate_features' False to used the features already computed, True to compute them from scratch, default = False
+'-gf', '--generate_features' False to use the features already computed, True to compute them from scratch, default = False
 ```
 
 ## Acknowledgments
