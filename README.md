@@ -1,21 +1,22 @@
 # Style Classification
 
+## 
 
 ### 1. Use our drive (data and functions are already downloaded) : 
-https://drive.google.com/drive/folders/1TxWlhFs9hKlKEzAbL6Mw6PHLIWjCF7-w?usp=sharing
+[Link to the drive](https://drive.google.com/drive/folders/1TxWlhFs9hKlKEzAbL6Mw6PHLIWjCF7-w?usp=sharing)
 
 ### 2. You can run directly the notebook : Notebook art classification project, in the drive 
 
 ## OR 
 
 ### 1. Download the data from these URL:
-https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip
+[train1](https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip)
 
-https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip
+[train2](https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip)
 
-https://www.kaggle.com/c/painter-by-numbers/data/train_info.csv
+[train_info](https://www.kaggle.com/c/painter-by-numbers/data/train_info.csv)
 
-ATTENTION : need to have a kaggle account and to approave the project
+(You need to have a kaggle account and to approve the project)
 
 ### 2. Unzip the files in the directory raw_data, organisation of the directory should be:
 
@@ -42,15 +43,14 @@ ATTENTION : need to have a kaggle account and to approave the project
  The file scaleParams.P will be generated automatically by the Dataloader.
  The folders resnet and vgg16 will be generated automatically by the FeaturesGenerator.
 
-### 3. For the first resnet training, run:
+### 3. First ResNet training:
 ```bash
+# compute features
 python main.py -o False -rd raw_data -dd data -m resnet -sc True -gf True 
-```
-### 4. Then, when the features are already ccomputed, just run:
-```bash
+# train
 python main.py -dd data
 ```
-### 4. All parameters available:
+Parameters available:
 ```bash
 '-gpu', '--use_gpu'       Whether to use GPU or not, default = False
 '-o', '--is_organised'    Whether the directory is already organised or not, default = True
@@ -61,7 +61,11 @@ python main.py -dd data
 '-m', '--model'
 '-gf', '--generate_features'
 ```
+## Acknowledgments
 
+- [Recognizing Art Style Automatically in painting with deep learning (Adrian Lecoutre, Benjamin Negrevergne, Florian Yger, 2017)](http://www.lamsade.dauphine.fr/~bnegrevergne/webpage/documents/2017_rasta.pdf)
+
+- [Kaggle](www.kaggle.com) competition
 
 
 
