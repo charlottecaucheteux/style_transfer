@@ -10,7 +10,7 @@ We used a deep learning approach, with transfer learning from a VGG19 and a resi
 
 Use the [drive](https://drive.google.com/drive/folders/1TxWlhFs9hKlKEzAbL6Mw6PHLIWjCF7-w?usp=sharing) directly
 
-Run the Notebook art classification project.
+Run the [Notebook Art Classification](https://colab.research.google.com/drive/1E_5VPcLQYOh8LcPjjguzwKU1GwhXCRgz?authuser=1) project on the drive.
 
 ### Run locally
 
