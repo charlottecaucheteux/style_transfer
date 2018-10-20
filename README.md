@@ -1,24 +1,26 @@
 # Style Classification
 
-## 
+This project aims at classify paintings according to their style.
 
-### 1. Use our drive (data and functions are already downloaded) : 
-[Link to the drive](https://drive.google.com/drive/folders/1TxWlhFs9hKlKEzAbL6Mw6PHLIWjCF7-w?usp=sharing)
+## Getting Started
 
-### 2. You can run directly the notebook : Notebook art classification project, in the drive 
+### Run on the cloud
 
-## OR 
+Use the [drive](https://drive.google.com/drive/folders/1TxWlhFs9hKlKEzAbL6Mw6PHLIWjCF7-w?usp=sharing) directly
 
-### 1. Download the data from these URL:
-[train1](https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip)
+Run the Notebook art classification project.
 
-[train2](https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip)
+### Run locally
 
-[train_info](https://www.kaggle.com/c/painter-by-numbers/data/train_info.csv)
+#### The data
+Download the data from these URL:
+- [train1](https://www.kaggle.com/c/painter-by-numbers/download/train_1.zip)
+- [train2](https://www.kaggle.com/c/painter-by-numbers/download/train_2.zip)
+- [train_info](https://www.kaggle.com/c/painter-by-numbers/data/train_info.csv)
 
 (You need to have a kaggle account and to approve the project)
 
-### 2. Unzip the files in the directory raw_data, organisation of the directory should be:
+Unzip the files in the directory raw_data, organisation of the directory should be:
 
 ```bash
 ├── raw_data
@@ -43,7 +45,7 @@
  The file scaleParams.P will be generated automatically by the Dataloader.
  The folders resnet and vgg16 will be generated automatically by the FeaturesGenerator.
 
-### 3. First ResNet training:
+#### The training:
 ```bash
 # compute features
 python main.py -o False -rd raw_data -dd data -m resnet -sc True -gf True 
@@ -61,6 +63,7 @@ Parameters available:
 '-m', '--model'
 '-gf', '--generate_features'
 ```
+
 ## Acknowledgments
 
 - [Recognizing Art Style Automatically in painting with deep learning (Adrian Lecoutre, Benjamin Negrevergne, Florian Yger, 2017)](http://www.lamsade.dauphine.fr/~bnegrevergne/webpage/documents/2017_rasta.pdf)
